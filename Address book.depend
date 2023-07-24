@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1690180218 source:d:\12_przyszly programista\address book\main.cpp
+	<iostream>
+	<windows.h>
+	<string>
+	<conio.h>
+	<fstream>
+	<cstdlib>
+	<vector>
+
+1690197343 source:d:\12_przyszly programista\repo\address-book_project\main.cpp
+	<iostream>
+	<windows.h>
+	<string>
+	<conio.h>
+	<fstream>
+	<cstdlib>
+	<vector>
+
