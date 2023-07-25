@@ -1,1 +1,2 @@
-1|Jakub|Zawadzki|999 222 333|jakub@zawadzki.pl|ul. Miodowa 15; 09-888 Krakow|
+1|Jakub|Zawadzki|888 333 222|jakub@zawadzki.pl|ul. Miodowa 17; 22-333 Krakow|
+2|Krystyna|Maklowicz|222 333 444|krystyna@maklowicz.pl|ul. Chrobrego 15; 09-222 Gdansk|
