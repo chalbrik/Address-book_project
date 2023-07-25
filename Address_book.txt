@@ -1,2 +1,11 @@
-1|Jakub|Zawadzki|888 333 222|jakub@zawadzki.pl|ul. Miodowa 17; 22-333 Krakow|
-2|Krystyna|Maklowicz|222 333 444|krystyna@maklowicz.pl|ul. Chrobrego 15; 09-222 Gdansk|
+1|1|Jakub|Mickiewicz|333 444 555|jakub@mickiewicz.pl|ul. Miodowa 15; 44-333 Gdynia|
+2|1|Barry|Allen|333 444 222|barry@allen.pl|ul. Zielona 15; 99-000 Warszawa|
+3|2|Milena|Komorowska|222 333 444|milena@komorowska.pl|ul. Noakowskiego 17; 08-222 Poznan|
+4|3|Greta|Gerwig|9999 222 33|greta@gerwig.pl|ul. Jezioranskiego 1; 82-222 Warszawa|
+5|3|Bruce|Wayne|333 222 111|bruce@wayne.pl|ul. Nietoperza 11; 92-222 Gotham City|
+6|1|Antoni|Moroni|333 444 55|antoni@moroni.pl|ul. Marszalkowska 14; 09-222 Lublin|
+7|1|Noah|Baumbach|222 111 222|noah@baumbach.pl|ul. Rakietnikow 12; 09-111 Wroclaw|
+8|3|Aleksander|Wielki|222 333 44|aleksander15@onet.pl|ul. Egipska 12; 09-222 Zakopane|
+4|2|Uma|Thurman|222 333 44|uma@thurman.pl|ul. Radiowa 17; 11-222 Warszawa|
+5|2|Kevin|Bacon II|333 444 555|kevin@becon.pl|ul. Hawajska 123a; 22-333 Wladyslawowo|
+9|3|Guku|Vegeta|333 222 333|guku@vegeta.pl|ul. God 87; 12-333 Nowy Jork|
