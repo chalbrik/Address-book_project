@@ -105,7 +105,7 @@ void getUsersFromFile(vector <User> &users) {
     usersDataFile.close();
 }
 
-void getContactsFromFile(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts) { //tutaj moglybm zamienic voidd na int z indeksem ostatniego id
+int getContactsFromFile(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts) {
     fstream file;
     string line;
     int numberOfLine = 1;
@@ -115,6 +115,7 @@ void getContactsFromFile(vector <User> &users, int loggedUsersIndex, vector <Con
     int indexOfVerticalBar = 0;
     int lenghtOfLineAfterVerticalBar = 0;
     int caseCounter = 0;
+    int lastContactId = 0;
 
     file.open("Address_book.txt", ios::in);
 
@@ -139,13 +140,12 @@ void getContactsFromFile(vector <User> &users, int loggedUsersIndex, vector <Con
                     switch(caseCounter) {
                     case 1:
                         contactData.contactId = stoi(extract);
+                        lastContactId = contactData.contactId;
+                        cout << " Jestem w get contacts form file. Ostatnie id uzytkownika na liscie: " << lastContactId << endl;
+                        system("pause");
                         break;
                     case 2:
                         contactData.userId = stoi(extract);
-                        system("cls");
-                        cout << contactData.userId << endl;
-                        cout << users[loggedUsersIndex].userId << endl;
-                        system("pause");
                         break;
                     case 3:
                         contactData.name = extract;
@@ -178,6 +178,8 @@ void getContactsFromFile(vector <User> &users, int loggedUsersIndex, vector <Con
         }
     }
     file.close();
+
+    return lastContactId;
 }
 
 void saveContactsToFile(vector <Contact> &contacts) {
@@ -232,7 +234,7 @@ void overrideContactsInFile(vector <Contact> &contacts, int index, bool edit) { 
 
 }
 
-void saveContact(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts) {
+int saveContact(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts, int lastContactOverallId) {
 
     Contact contactData;
 
@@ -254,7 +256,8 @@ void saveContact(vector <User> &users, int loggedUsersIndex, vector <Contact> &c
     cout << "Home addres: ";
     contactData.address = readLine();
 
-    contactData.contactId = (contacts.size() > 0) ? contacts[contacts.size() - 1].contactId + 1 : 1; //tutaj trzeba zmienic naliczanie indeksow kontaktow nowych
+    contactData.contactId = ++lastContactOverallId;
+
     contactData.userId = users[loggedUsersIndex].userId;
 
     contacts.push_back(contactData);
@@ -267,6 +270,8 @@ void saveContact(vector <User> &users, int loggedUsersIndex, vector <Contact> &c
     cout << "///ADDRESS BOOK -> Save contact" << endl << endl;
     cout << "Contact was successfully added to address book." << endl << endl;
     system("pause");
+
+    return lastContactOverallId;
 }
 
 void writeOutContacts(vector <Contact> &contacts, int index) {
@@ -389,7 +394,7 @@ void getRidOfContact(vector <Contact> &contacts) {
                         if(getRidOfConfirmation == 'y' || getRidOfConfirmation == 'Y') {
                             contacts.erase(contacts.begin() + i);
                             overrideContactsInFile(contacts, i, false);
-                        } else {
+                        } else if(getRidOfConfirmation == 'n' || getRidOfConfirmation == 'N') {
                             return;
                         }
                     } else if(stoi(idToGetRidOf) != contacts[i].contactId && i == contacts.size() - 1) {
@@ -517,13 +522,14 @@ void editContact(vector <Contact> &contacts) {
 }
 
 
-void displayMainAddressBookPage(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts) {
+void displayMainAddressBookPage(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts, int lastContactOverallId) {
     char choice;
 
     while(1) {
         system("cls");
         cout << "ADDRESS BOOK -> Walcome " << users[loggedUsersIndex].username << endl << endl;
         cout << "Number of contacts in the book - " << contacts.size() << endl << endl;
+        cout << "Ostatnie id kontaktu w ogole na lisice: " << lastContactOverallId << endl << endl;
         cout << "1 - Save contact" << endl;
         cout << "2 - Search contact" << endl;
         cout << "3 - Delete contact" << endl;
@@ -535,7 +541,7 @@ void displayMainAddressBookPage(vector <User> &users, int loggedUsersIndex, vect
         cout << endl;
 
         if(choice == '1') {
-            saveContact(users, loggedUsersIndex, contacts);
+            lastContactOverallId = saveContact(users, loggedUsersIndex, contacts, lastContactOverallId);
 
         } else if(choice == '2') {
             searchContact(contacts);
@@ -547,7 +553,6 @@ void displayMainAddressBookPage(vector <User> &users, int loggedUsersIndex, vect
             editContact(contacts);
 
         } else if(choice == '5') {
-            // trzeba wyczyœciæ wektor contacts
             contacts.clear();
             break;
         }
@@ -587,12 +592,11 @@ void signIn(vector <User> &users) {
     return;
 }
 
-void logIn(vector <User> &users, vector <Contact> &contacts) {
+int logIn(vector <User> &users) {
 
     string username = "";
     string password = "";
-    int loggedUsersIndex = 0;
-    int lastContactId = 0;
+    int loggedUsersIndex = -1;
 
     system("cls");
     cout << "ADDRESS BOOK -> Log in" << endl << endl;
@@ -601,27 +605,24 @@ void logIn(vector <User> &users, vector <Contact> &contacts) {
     cout << "Password: ";
     password = readLine();
 
-    for(size_t i = 0; i < users.size(); i++) {
-        if(username == users[i].username && password == users[i].password) {
-            loggedUsersIndex = i;
-            system("cls");
-            cout << "Hello " << users[i].username << ". You are successfully logged in." << endl << endl;
-            system("pause");
-            getContactsFromFile(users, loggedUsersIndex, contacts); // !!!!!!!!!!
-            displayMainAddressBookPage(users, loggedUsersIndex, contacts);
+    while(loggedUsersIndex == -1) {
+        for(size_t i = 0; i < users.size(); i++) {
+            if(username == users[i].username && password == users[i].password) {
+                loggedUsersIndex = i;
+                break;
 
+            } else if(username != users[i].username && password == users[i].password) {
+                cout << "Nieprawodlowy login" << endl << endl;
+                system("pause");
 
-        } else if(username != users[i].username && password == users[i].password) {
-            cout << "Nieprawodlowy login" << endl << endl;
-            system("pause");
-
-        } else if(username == users[i].username && password != users[i].password) {
-            cout << "Nieprawidlowe haslo" << endl;
-            system("pause");
+            } else if(username == users[i].username && password != users[i].password) {
+                cout << "Nieprawidlowe haslo" << endl;
+                system("pause");
+            }
         }
     }
 
-    return;
+    return loggedUsersIndex;
 }
 
 char displayEntryAppPage(vector <User> &users) {
@@ -641,22 +642,6 @@ char displayEntryAppPage(vector <User> &users) {
     return chosenOption;
 }
 
-void selectOptionForUser(vector <User> &users, vector <Contact> &contacts, char chosenOption) {
-    if(chosenOption == '1') {
-        logIn(users, contacts);
-
-    } else if(chosenOption == '2') {
-        signIn(users);
-
-    } else if(chosenOption == '3') {
-        exit(0);
-
-    } else {
-        system("cls");
-        cout << "This option is not a possibility. Try again." << endl << endl;
-        system("pause");
-    }
-}
 
 
 int main() {
@@ -665,15 +650,45 @@ int main() {
     vector <Contact> contacts;
 
     char chosenOption;
+    int loggedUsersIndex = 0;
+    int lastContactOverallId = 1;
 
     getUsersFromFile(users);
 
 
     while(1) {
 
-        chosenOption = displayEntryAppPage(users);
+        chosenOption = displayEntryAppPage(users); //1
 
-        selectOptionForUser(users, contacts, chosenOption);
+        if(chosenOption == '1' && users.size() > 0) {
+            loggedUsersIndex = logIn(users);
+            //greeting
+            system("cls");
+            cout << "Hello " << users[loggedUsersIndex].username << ". You are successfully logged in." << endl << endl;
+
+            lastContactOverallId = getContactsFromFile(users, loggedUsersIndex, contacts); //pobieranie kontaktow dla danego uzytkownika
+
+            displayMainAddressBookPage(users, loggedUsersIndex, contacts, lastContactOverallId); //wchodze do apki wyzej czyli do ksi¹zki adresowej danego uzytkownika
+
+
+        } else if(chosenOption == '1' && users.size() == 0) {
+            system("cls");
+            cout << "There are no signed users in the address book. Sign in to start using a book." << endl << endl;
+            system("pause");
+
+        } else if(chosenOption == '2') {
+            signIn(users);
+
+
+        } else if(chosenOption == '3') {
+            exit(0);
+
+        } else {
+            system("cls");
+            cout << "This option is not a possibility. Try again." << endl << endl;
+            system("pause");
+        }
+
     }
 
     return 0;
