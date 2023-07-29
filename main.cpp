@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <vector>
+#include <stdio.h>
 
 using namespace std;
 
@@ -141,8 +142,6 @@ int getContactsFromFile(vector <User> &users, int loggedUsersIndex, vector <Cont
                     case 1:
                         contactData.contactId = stoi(extract);
                         lastContactId = contactData.contactId;
-                        cout << " Jestem w get contacts form file. Ostatnie id uzytkownika na liscie: " << lastContactId << endl;
-                        system("pause");
                         break;
                     case 2:
                         contactData.userId = stoi(extract);
@@ -231,6 +230,100 @@ void overrideContactsInFile(vector <Contact> &contacts, int index, bool edit) { 
     for(size_t j = 0; j < fileLines.size(); j++) {
         file << fileLines[j] << endl;
     }
+
+}
+
+void overrideContactsInFile2(int contactIdToChange) {
+    fstream contactsDataFile;
+    fstream temporaryContactsDataFile;
+    vector <string> contactsDataFileLines;
+    string contactsDataFileLine;
+    string temporaryContactsDataFileLine;
+    string contactIdFromFile;
+    int changeFile = 0;
+    int changeFileName = 0;
+
+    int indexOfVerticalBar = 0;
+
+    contactsDataFile.open("Address_book.txt", ios::in);
+
+    if(contactsDataFile.fail()) {
+        cout << "File doesn't exist." << endl << endl;
+        system("pause");
+        return;
+    }
+
+    temporaryContactsDataFile.open("Address_book_temporary.txt", ios::out | ios::app);
+
+    while(getline(contactsDataFile, contactsDataFileLine)) {
+
+        indexOfVerticalBar = contactsDataFileLine.find('|');
+
+        contactIdFromFile = contactsDataFileLine.substr(0, indexOfVerticalBar);
+
+        if(contactIdToChange != stoi(contactIdFromFile)) {
+            temporaryContactsDataFile << contactsDataFileLine << endl;
+        }
+    }
+
+    contactsDataFile.close();
+    temporaryContactsDataFile.close();
+
+    changeFile = remove("Address_book.txt");
+
+    changeFileName = rename("Address_book_temporary.txt", "Address_book.txt");
+
+    return;
+
+}
+
+void overrideContactsInFile3(vector <Contact> &contacts, int index) {
+    fstream contactsDataFile;
+    fstream temporaryContactsDataFile;
+    vector <string> contactsDataFileLines;
+    string contactsDataFileLine;
+    string temporaryContactsDataFileLine;
+    string contactIdFromFile;
+    string editedContact;
+    int changeFile = 0;
+    int changeFileName = 0;
+
+
+    int indexOfVerticalBar = 0;
+
+    contactsDataFile.open("Address_book.txt", ios::in);
+
+    if(contactsDataFile.fail()) {
+        cout << "File doesn't exist." << endl << endl;
+        system("pause");
+        return;
+    }
+
+    temporaryContactsDataFile.open("Address_book_temporary.txt", ios::out | ios::app);
+
+    while(getline(contactsDataFile, contactsDataFileLine)) {
+
+        indexOfVerticalBar = contactsDataFileLine.find('|');
+
+        contactIdFromFile = contactsDataFileLine.substr(0, indexOfVerticalBar);
+
+        if(contacts[index].contactId == stoi(contactIdFromFile)) {
+            editedContact = to_string(contacts[index].contactId) + "|" + to_string(contacts[index].userId) + "|" + contacts[index].name + "|" + contacts[index].lastName + "|" + contacts[index].telephone + "|" + contacts[index].email + "|" + contacts[index].address + "|";
+            temporaryContactsDataFile << editedContact << endl;
+        } else {
+            temporaryContactsDataFile << contactsDataFileLine << endl;
+        }
+    }
+
+    contactsDataFile.close();
+    temporaryContactsDataFile.close();
+
+    changeFile = remove("Address_book.txt");
+
+    changeFileName = rename("Address_book_temporary.txt", "Address_book.txt");
+
+
+    return;
 
 }
 
@@ -393,7 +486,8 @@ void getRidOfContact(vector <Contact> &contacts) {
 
                         if(getRidOfConfirmation == 'y' || getRidOfConfirmation == 'Y') {
                             contacts.erase(contacts.begin() + i);
-                            overrideContactsInFile(contacts, i, false);
+                            //overrideContactsInFile(contacts, i, false);
+                            overrideContactsInFile2(stoi(idToGetRidOf));
                         } else if(getRidOfConfirmation == 'n' || getRidOfConfirmation == 'N') {
                             return;
                         }
@@ -496,7 +590,8 @@ void editContact(vector <Contact> &contacts) {
                         } else if(choice == '6') {
                             return;
                         }
-                        overrideContactsInFile(contacts, i, true);
+                        //overrideContactsInFile(contacts, i, true);
+                        overrideContactsInFile3(contacts, i);
                     }
                 }
             } else if(choice == '2') {

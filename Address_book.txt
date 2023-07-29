@@ -1,8 +1,8 @@
 1|5|Miroslaw|Zalewski|333 222 333|miroslaw@zalewski.pl|ul. Niedzwiedzia 1; 09-222 Warszawa|
 2|5|Justyna|Kowalczyk|111 222 333|justyna@kowalczyk.pl|ul. Ochocka 2; 22-333 Poznan|
 3|1|Jacek|Gorski|111 222 333|jacek@gorksi.pl|ul. Miodowa 12; 09-111 Lublin|
-4|1|Ronald|Regan|222 333 444|ronald@regan.pl|ul. Prezydencka 123; 22-333 Rzeszow|
 5|4|Janusz|Wieczorek|222 333 444|janusz@wieczorek.pl|ul. Chrobrego 14; 09-000 Gdansk|
-6|3|Krzysztod|Stanowski|111 222 33|krzysztof@stanowski.pl|ul. Krucza 3; 09-099 Warszawa|
+6|3|Krzysztof|Stanowski|111 222 33|krzysztof@stanowski.pl|ul. Krucza 3; 09-099 Warszawa|
 7|5|Joanna|Krupa|111 222 333|joanna@krupa.pl|ul. Lodowa 23; 09-222 Konstancin|
 8|2|George|Bush|3334 444 333|george@bush.pl|ul. Wojska Polskiego 14; 23-444 Warszawa|
+9|4|Janusz|Korwin|222 333 444|janusz@kowrwin.pl|ul. Mokotowska 15; 00-222 Warszawa|
