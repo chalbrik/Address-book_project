@@ -1,5 +1,3 @@
 1|dead|pool|
-2|peter|pan|
-3|milena|vader|
-4|buda|pest|
-5|gigi|hadid|
+2|mona|lisa|
+3|peter|pan|

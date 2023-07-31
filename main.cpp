@@ -49,7 +49,6 @@ char getSymbol() {
     return symbol;
 }
 
-
 void getUsersFromFile(vector <User> &users) {
     fstream usersDataFile;
     string line;
@@ -192,102 +191,14 @@ void saveContactsToFile(vector <Contact> &contacts) {
     file.close();
 }
 
-void overrideContactsInFile(vector <Contact> &contacts, int index, bool edit) { //moze trzebabedzie tutaj dodac warunek otwierania sie plikow czy istnieja
-    fstream file;
-    vector <string> fileLines;
-    string fileLine;
-    string editedContact = "";
-
-    file.open("Address_book.txt", ios::in);
-
-    if(file.fail()) {
-        cout << "File doesn't exist." << endl << endl;
-        system("pause");
-        return;
-    }
-
-    while(getline(file, fileLine)) {
-        fileLines.push_back(fileLine);
-    }
-
-    file.close();
-
-    fileLines.erase(fileLines.begin() + index);
-
-    if(edit == true) {
-        editedContact = to_string(contacts[index].contactId) + "|" + to_string(contacts[index].contactId) + "|" + contacts[index].name + "|" + contacts[index].lastName + "|" + contacts[index].telephone + "|" + contacts[index].email + "|" + contacts[index].address + "|";
-        fileLines.insert(fileLines.begin() + index, editedContact);
-    }
-
-    file.open("Address_book.txt", ios::out);
-
-    if(file.fail()) {
-        cout << "File doesn't exist." << endl << endl;
-        system("pause");
-        return;
-    }
-
-    for(size_t j = 0; j < fileLines.size(); j++) {
-        file << fileLines[j] << endl;
-    }
-
-}
-
-void overrideContactsInFile2(int contactIdToChange) {
+void overrideContactsInFile(vector <Contact> &contacts, int index, bool deleteOrEdit) {
     fstream contactsDataFile;
     fstream temporaryContactsDataFile;
-    vector <string> contactsDataFileLines;
     string contactsDataFileLine;
-    string temporaryContactsDataFileLine;
-    string contactIdFromFile;
-    int changeFile = 0;
-    int changeFileName = 0;
-
-    int indexOfVerticalBar = 0;
-
-    contactsDataFile.open("Address_book.txt", ios::in);
-
-    if(contactsDataFile.fail()) {
-        cout << "File doesn't exist." << endl << endl;
-        system("pause");
-        return;
-    }
-
-    temporaryContactsDataFile.open("Address_book_temporary.txt", ios::out | ios::app);
-
-    while(getline(contactsDataFile, contactsDataFileLine)) {
-
-        indexOfVerticalBar = contactsDataFileLine.find('|');
-
-        contactIdFromFile = contactsDataFileLine.substr(0, indexOfVerticalBar);
-
-        if(contactIdToChange != stoi(contactIdFromFile)) {
-            temporaryContactsDataFile << contactsDataFileLine << endl;
-        }
-    }
-
-    contactsDataFile.close();
-    temporaryContactsDataFile.close();
-
-    changeFile = remove("Address_book.txt");
-
-    changeFileName = rename("Address_book_temporary.txt", "Address_book.txt");
-
-    return;
-
-}
-
-void overrideContactsInFile3(vector <Contact> &contacts, int index) {
-    fstream contactsDataFile;
-    fstream temporaryContactsDataFile;
-    vector <string> contactsDataFileLines;
-    string contactsDataFileLine;
-    string temporaryContactsDataFileLine;
     string contactIdFromFile;
     string editedContact;
-    int changeFile = 0;
-    int changeFileName = 0;
-
+    int deleteOriginalFile = 0;
+    int renameTemporaryFileToOriginal = 0;
 
     int indexOfVerticalBar = 0;
 
@@ -307,21 +218,36 @@ void overrideContactsInFile3(vector <Contact> &contacts, int index) {
 
         contactIdFromFile = contactsDataFileLine.substr(0, indexOfVerticalBar);
 
-        if(contacts[index].contactId == stoi(contactIdFromFile)) {
-            editedContact = to_string(contacts[index].contactId) + "|" + to_string(contacts[index].userId) + "|" + contacts[index].name + "|" + contacts[index].lastName + "|" + contacts[index].telephone + "|" + contacts[index].email + "|" + contacts[index].address + "|";
-            temporaryContactsDataFile << editedContact << endl;
-        } else {
-            temporaryContactsDataFile << contactsDataFileLine << endl;
+        if(deleteOrEdit == true) {
+            if(contacts[index].contactId != stoi(contactIdFromFile)) {
+                temporaryContactsDataFile << contactsDataFileLine << endl;
+            }
+        } else if(deleteOrEdit == false) {
+            if(contacts[index].contactId == stoi(contactIdFromFile)) {
+                editedContact = to_string(contacts[index].contactId) + "|" + to_string(contacts[index].userId) + "|" + contacts[index].name + "|" + contacts[index].lastName + "|" + contacts[index].telephone + "|" + contacts[index].email + "|" + contacts[index].address + "|";
+                temporaryContactsDataFile << editedContact << endl;
+            } else {
+                temporaryContactsDataFile << contactsDataFileLine << endl;
+            }
         }
     }
 
     contactsDataFile.close();
     temporaryContactsDataFile.close();
 
-    changeFile = remove("Address_book.txt");
+    deleteOriginalFile = remove("Address_book.txt");
 
-    changeFileName = rename("Address_book_temporary.txt", "Address_book.txt");
+    renameTemporaryFileToOriginal = rename("Address_book_temporary.txt", "Address_book.txt");
 
+    if(deleteOriginalFile == 0 && renameTemporaryFileToOriginal == 0 && deleteOrEdit == true) {
+        system("cls");
+        cout << "Contact has been successfully deleted." << endl << endl;
+        system("pause");
+    } else if(deleteOriginalFile == 0 && renameTemporaryFileToOriginal == 0 && deleteOrEdit == false) {
+        system("cls");
+        cout << "Contact has been successfully edited." << endl << endl;
+        system("pause");
+    }
 
     return;
 
@@ -481,13 +407,14 @@ void getRidOfContact(vector <Contact> &contacts) {
                         cout << "You request for deleting: " << endl;
                         writeOutContacts(contacts, i);
                         cout << endl;
-                        cout << "Are you sure you want to delete that contact? If yes, press - y. If no, press - n." << endl;
+                        cout << "Are you sure you want to delete that contact? If yes, press - y. If no, press - n." << endl << endl;
+                        cout << "Option: ";
                         getRidOfConfirmation = getSymbol();
 
                         if(getRidOfConfirmation == 'y' || getRidOfConfirmation == 'Y') {
+                            overrideContactsInFile(contacts, i, true);
                             contacts.erase(contacts.begin() + i);
-                            //overrideContactsInFile(contacts, i, false);
-                            overrideContactsInFile2(stoi(idToGetRidOf));
+
                         } else if(getRidOfConfirmation == 'n' || getRidOfConfirmation == 'N') {
                             return;
                         }
@@ -590,8 +517,7 @@ void editContact(vector <Contact> &contacts) {
                         } else if(choice == '6') {
                             return;
                         }
-                        //overrideContactsInFile(contacts, i, true);
-                        overrideContactsInFile3(contacts, i);
+                        overrideContactsInFile(contacts, i, false);
                     }
                 }
             } else if(choice == '2') {
@@ -616,15 +542,13 @@ void editContact(vector <Contact> &contacts) {
 
 }
 
-
 void displayMainAddressBookPage(vector <User> &users, int loggedUsersIndex, vector <Contact> &contacts, int lastContactOverallId) {
     char choice;
 
     while(1) {
         system("cls");
-        cout << "ADDRESS BOOK -> Walcome " << users[loggedUsersIndex].username << endl << endl;
+        cout << "ADDRESS BOOK -> Welcome " << users[loggedUsersIndex].username << endl << endl;
         cout << "Number of contacts in the book - " << contacts.size() << endl << endl;
-        cout << "Ostatnie id kontaktu w ogole na lisice: " << lastContactOverallId << endl << endl;
         cout << "1 - Save contact" << endl;
         cout << "2 - Search contact" << endl;
         cout << "3 - Delete contact" << endl;
@@ -700,21 +624,20 @@ int logIn(vector <User> &users) {
     cout << "Password: ";
     password = readLine();
 
-    while(loggedUsersIndex == -1) {
-        for(size_t i = 0; i < users.size(); i++) {
-            if(username == users[i].username && password == users[i].password) {
-                loggedUsersIndex = i;
-                break;
+    for(size_t i = 0; i < users.size(); i++) { //tu jest b³ad trzeba to jakos inaczej napisaæ
+        if(username == users[i].username && password == users[i].password) {
+            loggedUsersIndex = i;
+            break;
 
-            } else if(username != users[i].username && password == users[i].password) {
-                cout << "Nieprawodlowy login" << endl << endl;
-                system("pause");
-
-            } else if(username == users[i].username && password != users[i].password) {
-                cout << "Nieprawidlowe haslo" << endl;
-                system("pause");
-            }
+        } else if(username == users[i].username && password != users[i].password) {
+            cout << endl << "Incorrect password." << endl << endl;
+            loggedUsersIndex = -2;
+            system("pause");
         }
+    }
+    if(loggedUsersIndex == -1) {
+        cout << endl << "Incorrect login." << endl << endl;
+        system("pause");
     }
 
     return loggedUsersIndex;
@@ -737,6 +660,37 @@ char displayEntryAppPage(vector <User> &users) {
     return chosenOption;
 }
 
+int ActOnEntryAppPage(char chosenOption, vector <User> &users) {
+
+    int loggedUsersIndex = 0;
+
+    if(chosenOption == '1' && users.size() > 0) {
+        loggedUsersIndex = logIn(users);
+
+    } else if(chosenOption == '1' && users.size() == 0) {
+        system("cls");
+        cout << "There are no signed users in the address book. Sign in to start using a book." << endl << endl;
+        loggedUsersIndex = -1;
+
+        system("pause");
+
+    } else if(chosenOption == '2') {
+        signIn(users);
+        loggedUsersIndex = -1;
+
+
+    } else if(chosenOption == '3') {
+        exit(0);
+
+    } else {
+        system("cls");
+        cout << "This option is not a possibility. Try again." << endl << endl;
+        loggedUsersIndex = -1;
+        system("pause");
+    }
+
+    return loggedUsersIndex;
+}
 
 
 int main() {
@@ -750,38 +704,21 @@ int main() {
 
     getUsersFromFile(users);
 
-
     while(1) {
 
-        chosenOption = displayEntryAppPage(users); //1
+        chosenOption = displayEntryAppPage(users);
 
-        if(chosenOption == '1' && users.size() > 0) {
-            loggedUsersIndex = logIn(users);
-            //greeting
+        loggedUsersIndex = ActOnEntryAppPage(chosenOption, users);
+
+        while(loggedUsersIndex >= 0) {
             system("cls");
             cout << "Hello " << users[loggedUsersIndex].username << ". You are successfully logged in." << endl << endl;
 
-            lastContactOverallId = getContactsFromFile(users, loggedUsersIndex, contacts); //pobieranie kontaktow dla danego uzytkownika
+            lastContactOverallId = getContactsFromFile(users, loggedUsersIndex, contacts);
 
-            displayMainAddressBookPage(users, loggedUsersIndex, contacts, lastContactOverallId); //wchodze do apki wyzej czyli do ksi¹zki adresowej danego uzytkownika
+            displayMainAddressBookPage(users, loggedUsersIndex, contacts, lastContactOverallId);
 
-
-        } else if(chosenOption == '1' && users.size() == 0) {
-            system("cls");
-            cout << "There are no signed users in the address book. Sign in to start using a book." << endl << endl;
-            system("pause");
-
-        } else if(chosenOption == '2') {
-            signIn(users);
-
-
-        } else if(chosenOption == '3') {
-            exit(0);
-
-        } else {
-            system("cls");
-            cout << "This option is not a possibility. Try again." << endl << endl;
-            system("pause");
+            loggedUsersIndex = -1;
         }
 
     }
